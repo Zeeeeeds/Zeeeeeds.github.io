@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 实用工具 | XXX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        ai: '#8b5cf6',
+                        dark: '#1e293b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    keyframes: {
+                        pulse-light: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.7 },
+                        },
+                        spin-slow: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        }
+                    },
+                    animation: {
+                        'pulse-light': 'pulse-light 2s infinite',
+                        'spin-slow': 'spin-slow 3s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto { content-visibility: auto; }
+            .card-hover { @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1; }
+            .tool-btn { @apply px-4 py-2 rounded-lg transition-all duration-300; }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 dark:bg-dark text-gray-800 dark:text-gray-100 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="fixed w-full bg-white/90 dark:bg-dark/90 backdrop-blur-sm shadow-sm z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-primary dark:text-ai">AI·Portfolio</a>
+            
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html" class="hover:text-primary dark:hover:text-ai transition-colors">首页</a>
+                <a href="blog.html" class="hover:text-primary dark:hover:text-ai transition-colors">博客</a>
+                <a href="tools.html" class="hover:text-primary dark:hover:text-ai transition-colors font-medium">工具</a>
+                <a href="about.html" class="hover:text-primary dark:hover:text-ai transition-colors">关于我</a>
+            </div>
+            
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <i class="fa fa-moon-o dark:hidden" aria-hidden="true"></i>
+                <i class="fa fa-sun-o hidden dark:block" aria-hidden="true"></i>
+            </button>
+            
+            <button id="mobile-menu-btn" class="md:hidden p-2">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </button>
+        </div>
+        
+        <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-dark shadow-md">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="index.html" class="py-2 hover:text-primary dark:hover:text-ai">首页</a>
+                <a href="blog.html" class="py-2 hover:text-primary dark:hover:text-ai">博客</a>
+                <a href="tools.html" class="py-2 hover:text-primary dark:hover:text-ai font-medium">工具</a>
+                <a href="about.html" class="py-2 hover:text-primary dark:hover:text-ai">关于我</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 工具页面主体 -->
+    <section class="pt-32 pb-20 container mx-auto px-4">
+        <h1 class="text-4xl font-bold mb-2 text-center">AI 实用工具库</h1>
+        <p class="text-gray-600 dark:text-gray-300 text-center mb-12 max-w-2xl mx-auto">
+            专为AI学习者设计的轻量级工具，提升你的学习和实验效率
+        </p>
+
+        <!-- 工具标签切换 -->
+        <div class="flex flex-wrap justify-center gap-4 mb-10">
+            <button class="tool-btn bg-primary text-white" data-tool="timer">
+                <i class="fa fa-clock-o mr-2"></i>计时器
+            </button>
+            <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-tool="calculator">
+                <i class="fa fa-calculator mr-2"></i>AI计算器
+            </button>
+            <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-tool="editor">
+                <i class="fa fa-edit mr-2"></i>Markdown编辑器
+            </button>
+        </div>
+
+        <!-- 计时器工具 -->
+        <div id="timer" class="tool-content max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fa fa-clock-o text-primary dark:text-ai mr-3"></i>AI 实验计时器
+            </h2>
+            
+            <div class="text-center mb-8">
+                <div id="timer-display" class="text-6xl font-mono font-bold text-primary dark:text-ai mb-4">00:00:00</div>
+                <div class="flex justify-center gap-4 flex-wrap">
+                    <button id="timer-start" class="tool-btn bg-green-500 text-white hover:bg-green-600">
+                        <i class="fa fa-play mr-2"></i>开始
+                    </button>
+                    <button id="timer-pause" class="tool-btn bg-yellow-500 text-white hover:bg-yellow-600 disabled:opacity-50" disabled>
+                        <i class="fa fa-pause mr-2"></i>暂停
+                    </button>
+                    <button id="timer-reset" class="tool-btn bg-red-500 text-white hover:bg-red-600 disabled:opacity-50" disabled>
+                        <i class="fa fa-refresh mr-2"></i>重置
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-3">计时记录</h3>
+                <div id="timer-logs" class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 h-32 overflow-y-auto">
+                    <p class="text-gray-500 dark:text-gray-400 text-center">暂无记录</p>
+                </div>
+                <button id="timer-log" class="tool-btn bg-primary text-white mt-4 hover:bg-primary/90">
+                    <i class="fa fa-plus mr-2"></i>添加记录
+                </button>
+            </div>
+        </div>
+
+        <!-- AI计算器（默认隐藏） -->
+        <div id="calculator" class="tool-content max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hidden">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fa fa-calculator text-primary dark:text-ai mr-3"></i>AI 专用计算器
+            </h2>
+            
+            <div class="grid grid-cols-4 gap-3 mb-6">
+                <div class="col-span-4">
+                    <input type="text" id="calc-display" class="w-full bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-right text-xl font-mono" readonly>
+                </div>
+                <!-- 普通计算按钮 -->
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="7">7</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="8">8</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="9">9</button>
+                <button class="tool-btn bg-primary/20 dark:bg-ai/20 hover:bg-primary/30 dark:hover:bg-ai/30" data-calc="/">÷</button>
+                
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="4">4</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="5">5</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="6">6</button>
+                <button class="tool-btn bg-primary/20 dark:bg-ai/20 hover:bg-primary/30 dark:hover:bg-ai/30" data-calc="*">×</button>
+                
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="1">1</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="2">2</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="3">3</button>
+                <button class="tool-btn bg-primary/20 dark:bg-ai/20 hover:bg-primary/30 dark:hover:bg-ai/30" data-calc="-">-</button>
+                
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc="0">0</button>
+                <button class="tool-btn bg-gray-200 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-ai/10" data-calc=".">.</button>
+                <button class="tool-btn bg-green-500 text-white hover:bg-green-600" data-calc="=">=</button>
+                <button class="tool-btn bg-primary/20 dark:bg-ai/20 hover:bg-primary/30 dark:hover:bg-ai/30" data-calc="+">+</button>
+                
+                <!-- AI专用计算 -->
+                <button class="col-span-2 tool-btn bg-ai/20 dark:bg-ai/30 hover:bg-ai/40" data-calc="sigmoid">Sigmoid</button>
+                <button class="tool-btn bg-red-500 text-white hover:bg-red-600" data-calc="clear">C</button>
+                <button class="tool-btn bg-red-400 text-white hover:bg-red-500" data-calc="backspace">←</button>
+            </div>
+            
+            <div class="mt-4">
+                <h3 class="text-lg font-semibold mb-2">AI 常用函数</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button class="tool-btn bg-primary/10 dark:bg-ai/10 hover:bg-primary/20 dark:hover:bg-ai/20" data-calc="relu">ReLU(x)</button>
+                    <button class="tool-btn bg-primary/10 dark:bg-ai/10 hover:bg-primary/20 dark:hover:bg-ai/20" data-calc="tanh">Tanh(x)</button>
+                    <button class="tool-btn bg-primary/10 dark:bg-ai/10 hover:bg-primary/20 dark:hover:bg-ai/20" data-calc="softmax">Softmax</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Markdown编辑器（默认隐藏） -->
+        <div id="editor" class="tool-content max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hidden">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fa fa-edit text-primary dark:text-ai mr-3"></i>Markdown 编辑器
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">编辑区</h3>
+                    <textarea id="md-editor" class="w-full h-96 bg-gray-100 dark:bg-gray-700 rounded-lg p-4 font-mono" placeholder="# 开始编写你的技术博客...&#10;&#10;## 标题2&#10;&#10;```python&#10;# AI代码示例&#10;import torch&#10;```&#10;&#10;数学公式：$E=mc^2$"></textarea>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">预览区</h3>
+                    <div id="md-preview" class="w-full h-96 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-y-auto border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-eye mr-2 animate-spin-slow"></i>
+                            <span>实时预览将在这里显示</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex gap-4">
+                <button id="md-clear" class="tool-btn bg-red-500 text-white hover:bg-red-600">
+                    <i class="fa fa-trash mr-2"></i>清空
+                </button>
+                <button id="md-copy" class="tool-btn bg-primary text-white hover:bg-primary/90">
+                    <i class="fa fa-copy mr-2"></i>复制内容
+                </button>
+                <button id="md-download" class="tool-btn bg-green-500 text-white hover:bg-green-600">
+                    <i class="fa fa-download mr-2"></i>导出Markdown
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 XXX - AI 个人主页</p>
+            <p class="mt-2 text-gray-400 text-sm">
+                用 ❤️ 构建的 AI 学生个人展示平台
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 深色模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+        
+        // 移动端菜单
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md', 'py-2');
+                nav.classList.remove('shadow-sm', 'py-3');
+            } else {
+                nav.classList.remove('shadow-md', 'py-2');
+                nav.classList.add('shadow-sm', 'py-3');
+            }
+        });
+
+        // 工具标签切换逻辑
+        const toolButtons = document.querySelectorAll('[data-tool]');
+        const toolContents = document.querySelectorAll('.tool-content');
+        
+        toolButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 重置所有按钮样式
+                toolButtons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-gray-200', 'dark:bg-gray-700', 'hover:bg-primary/10', 'dark:hover:bg-ai/10');
+                });
+                
+                // 设置当前按钮样式
+                btn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'hover:bg-primary/10', 'dark:hover:bg-ai/10');
+                btn.classList.add('bg-primary', 'text-white');
+                
+                // 隐藏所有工具内容
+                toolContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // 显示选中的工具
+                const toolId = btn.getAttribute('data-tool');
+                document.getElementById(toolId).classList.remove('hidden');
+            });
+        });
+
+        // 计时器功能
+        let timerInterval;
+        let seconds = 0;
+        let timerRunning = false;
+        
+        const timerDisplay = document.getElementById('timer-display');
+        const startBtn = document.getElementById('timer-start');
+        const pauseBtn = document.getElementById('timer-pause');
+        const resetBtn = document.getElementById('timer-reset');
+        const logBtn = document.getElementById('timer-log');
+        const timerLogs = document.getElementById('timer-logs');
+        
+        // 格式化时间
+        function formatTime(secs) {
+            const hours = Math.floor(secs / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((secs % 3600) / 60).toString().padStart(2, '0');
+            const sec = (secs % 60).toString().padStart(2, '0');
+            return `${hours}:${minutes}:${sec}`;
+        }
+        
+        // 开始计时
+        startBtn.addEventListener('click', () => {
+            timerRunning = true;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            
+            timerInterval = setInterval(() => {
+                seconds++;
+                timerDisplay.textContent = formatTime(seconds);
+            }, 1000);
+        });
+        
+        // 暂停计时
+        pauseBtn.addEventListener('click', () => {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        });
+        
+        // 重置计时
+        resetBtn.addEventListener('click', () => {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            seconds = 0;
+            timerDisplay.textContent = formatTime(seconds);
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            resetBtn.disabled = true;
+        });
+        
+        // 添加计时记录
+        logBtn.addEventListener('click', () => {
+            if (seconds === 0) return;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between';
+            logEntry.innerHTML = `
+                <span>${timeStr}</span>
+                <span class="font-bold text-primary dark:text-ai">${formatTime(seconds)}</span>
+            `;
+            
+            // 清空默认提示
+            if (timerLogs.querySelector('.text-gray-500')) {
+                timerLogs.innerHTML = '';
+            }
+            
+            timerLogs.appendChild(logEntry);
+            // 滚动到底部
+            timerLogs.scrollTop = timerLogs.scrollHeight;
+        });
+
+        // AI计算器功能
+        const calcDisplay = document.getElementById('calc-display');
+        const calcButtons = document.querySelectorAll('[data-calc]');
+        
+        calcButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const value = btn.getAttribute('data-calc');
+                
+                switch(value) {
+                    case 'clear':
+                        calcDisplay.value = '';
+                        break;
+                    case 'backspace':
+                        calcDisplay.value = calcDisplay.value.slice(0, -1);
+                        break;
+                    case '=':
+                        try {
+                            // 替换×÷为标准运算符
+                            let expression = calcDisplay.value.replace(/×/g, '*').replace(/÷/g, '/');
+                            // 安全计算
+                            const result = Function(`'use strict'; return (${expression})`)();
+                            calcDisplay.value = result;
+                        } catch (e) {
+                            calcDisplay.value = 'Error';
+                            setTimeout(() => calcDisplay.value = '', 1500);
+                        }
+                        break;
+                    case 'sigmoid':
+                        try {
+                            const x = parseFloat(calcDisplay.value);
+                            const result = 1 / (1 + Math.exp(-x));
+                            calcDisplay.value = result.toFixed(6);
+                        } catch (e) {
+                            calcDisplay.value = 'Error';
+                            setTimeout(() => calcDisplay.value = '', 1500);
+                        }
+                        break;
+                    case 'relu':
+                        try {
+                            const x = parseFloat(calcDisplay.value);
+                            const result = Math.max(0, x);
+                            calcDisplay.value = result;
+                        } catch (e) {
+                            calcDisplay.value = 'Error';
+                            setTimeout(() => calcDisplay.value = '', 1500);
+                        }
+                        break;
+                    case 'tanh':
+                        try {
+                            const x = parseFloat(calcDisplay.value);
+                            const result = Math.tanh(x);
+                            calcDisplay.value = result.toFixed(6);
+                        } catch (e) {
+                            calcDisplay.value = 'Error';
+                            setTimeout(() => calcDisplay.value = '', 1500);
+                        }
+                        break;
+                    case 'softmax':
+                        calcDisplay.value = 'Softmax需要数组输入';
+                        setTimeout(() => calcDisplay.value = '', 2000);
+                        break;
+                    default:
+                        calcDisplay.value += value;
+                }
+            });
+        });
+
+        // Markdown编辑器（轻量版）
+        const mdEditor = document.getElementById('md-editor');
+        const mdPreview = document.getElementById('md-preview');
+        const mdClear = document.getElementById('md-clear');
+        const mdCopy = document.getElementById('md-copy');
+        const mdDownload = document.getElementById('md-download');
+        
+        // 简单的Markdown解析（轻量版）
+        function parseMarkdown(text) {
+            // 标题
+            text = text.replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold my-4">$1</h1>');
+            text = text.replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold my-3">$1</h2>');
+            text = text.replace(/^### (.*$)/gm, '<h3 class="text-lg font-bold my-2">$1</h3>');
+            
+            // 代码块
+            text = text.replace(/```([\s\S]*?)```/gm, '<pre class="bg-gray-900 text-white p-4 rounded-lg my-4 overflow-x-auto"><code>$1</code></pre>');
+            
+            // 行内代码
+            text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded">$1</code>');
+            
+            // 粗体
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
+            
+            // 斜体
+            text = text.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+            
+            // 换行
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+        
+        // 实时预览
+        mdEditor.addEventListener('input', () => {
+            const content = mdEditor.value;
+            if (content.trim() === '') {
+                mdPreview.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400"><i class="fa fa-eye mr-2 animate-spin-slow"></i><span>实时预览将在这里显示</span></div>';
+                return;
+            }
+            mdPreview.innerHTML = parseMarkdown(content);
+        });
+        
+        // 清空编辑器
+        mdClear.addEventListener('click', () => {
+            mdEditor.value = '';
+            mdPreview.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400"><i class="fa fa-eye mr-2 animate-spin-slow"></i><span>实时预览将在这里显示</span></div>';
+        });
+        
+        // 复制内容
+        mdCopy.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(mdEditor.value);
+            const originalText = mdCopy.innerHTML;
+            mdCopy.innerHTML = '<i class="fa fa-check mr-2"></i>复制成功';
+            setTimeout(() => {
+                mdCopy.innerHTML = originalText;
+            }, 2000);
+        });
+        
+        // 下载Markdown文件
+        mdDownload.addEventListener('click', () => {
+            const content = mdEditor.value;
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-blog-${new Date().getTime()}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
