@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeed - 个人主页</title>
-    <!-- TailwindCSS 快速样式 -->
+    <title>XXX - AI 个人主页</title>
+    <!-- 外部资源 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 图标库 -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 粒子背景 -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
     <!-- 自定义配置 -->
     <script>
@@ -16,13 +17,37 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6', // 主色（科技蓝）
-                        ai: '#8b5cf6',      // AI主题色（紫）
-                        dark: '#1e293b',    // 深色模式背景
+                        primary: '#3b82f6',
+                        ai: '#8b5cf6',
+                        dark: '#1e293b',
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        typing: {
+                            '0%': { width: '0%' },
+                            '100%': { width: '100%' },
+                        },
+                        blink: {
+                            '0%, 100%': { borderColor: 'transparent' },
+                            '50%': { borderColor: '#3b82f6' },
+                        }
+                    },
+                    animation: {
+                        float: 'float 3s ease-in-out infinite',
+                        fadeIn: 'fadeIn 0.8s ease-out forwards',
+                        typing: 'typing 3s steps(40) 1s forwards',
+                        blink: 'blink 1s infinite',
+                    }
                 }
             }
         }
@@ -30,32 +55,31 @@
     
     <style type="text/tailwindcss">
         @layer utilities {
-            .content-auto {
-                content-visibility: auto;
-            }
-            .text-shadow {
-                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            .card-hover {
-                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
-            }
+            .content-auto { content-visibility: auto; }
+            .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .card-hover { @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1; }
+            .section-fade { @apply opacity-0 translate-y-8 transition-all duration-1000; }
+            .section-fade.visible { @apply opacity-100 translate-y-0; }
+            .typing-container { @apply inline-block overflow-hidden whitespace-nowrap border-r-2 border-primary dark:border-ai w-0; }
         }
     </style>
 </head>
 
 <body class="bg-gray-50 dark:bg-dark text-gray-800 dark:text-gray-100 min-h-screen">
+    <!-- 粒子背景容器 -->
+    <div id="particles-js" class="fixed top-0 left-0 w-full h-full z-0 opacity-50 dark:opacity-30"></div>
+
     <!-- 导航栏 -->
-    <nav class="fixed w-full bg-white/90 dark:bg-dark/90 backdrop-blur-sm shadow-sm z-50">
+    <nav class="fixed w-full bg-white/90 dark:bg-dark/90 backdrop-blur-sm shadow-sm z-50 transition-all duration-300">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold text-primary dark:text-ai">AI·Portfolio</a>
+            <a href="index.html" class="text-xl font-bold text-primary dark:text-ai">AI·Portfolio</a>
             
-            <!-- 导航菜单 -->
+            <!-- 桌面端菜单 -->
             <div class="hidden md:flex space-x-6">
-                <a href="#home" class="hover:text-primary dark:hover:text-ai transition-colors">首页</a>
-                <a href="#about" class="hover:text-primary dark:hover:text-ai transition-colors">关于我</a>
-                <a href="#projects" class="hover:text-primary dark:hover:text-ai transition-colors">项目</a>
-                <a href="#skills" class="hover:text-primary dark:hover:text-ai transition-colors">技能</a>
-                <a href="#contact" class="hover:text-primary dark:hover:text-ai transition-colors">联系</a>
+                <a href="index.html" class="hover:text-primary dark:hover:text-ai transition-colors font-medium">首页</a>
+                <a href="blog.html" class="hover:text-primary dark:hover:text-ai transition-colors">博客</a>
+                <a href="tools.html" class="hover:text-primary dark:hover:text-ai transition-colors">工具</a>
+                <a href="about.html" class="hover:text-primary dark:hover:text-ai transition-colors">关于我</a>
             </div>
             
             <!-- 深色模式切换 -->
@@ -73,39 +97,40 @@
         <!-- 移动端菜单 -->
         <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-dark shadow-md">
             <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
-                <a href="#home" class="py-2 hover:text-primary dark:hover:text-ai">首页</a>
-                <a href="#about" class="py-2 hover:text-primary dark:hover:text-ai">关于我</a>
-                <a href="#projects" class="py-2 hover:text-primary dark:hover:text-ai">项目</a>
-                <a href="#skills" class="py-2 hover:text-primary dark:hover:text-ai">技能</a>
-                <a href="#contact" class="py-2 hover:text-primary dark:hover:text-ai">联系</a>
+                <a href="index.html" class="py-2 hover:text-primary dark:hover:text-ai font-medium">首页</a>
+                <a href="blog.html" class="py-2 hover:text-primary dark:hover:text-ai">博客</a>
+                <a href="tools.html" class="py-2 hover:text-primary dark:hover:text-ai">工具</a>
+                <a href="about.html" class="py-2 hover:text-primary dark:hover:text-ai">关于我</a>
             </div>
         </div>
     </nav>
 
     <!-- 首页 Hero 区域 -->
-    <section id="home" class="pt-32 pb-20 container mx-auto px-4">
+    <section id="home" class="pt-32 pb-20 container mx-auto px-4 relative z-10">
         <div class="flex flex-col md:flex-row items-center gap-8">
-            <div class="md:w-1/2">
+            <div class="md:w-1/2 section-fade">
                 <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-shadow">
-                    你好，我是 <span class="text-primary dark:text-ai">Zeed</span>
-                    <br>个人开发者
+                    你好，我是 <span class="text-primary dark:text-ai">XXX</span>
+                    <br>
+                    <span class="typing-container animate-typing">AI 方向 在读学生</span>
+                    <span class="animate-blink"></span>
                 </h1>
                 <p class="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-xl">
                     专注于机器学习、深度学习、计算机视觉方向的研究与实践，热爱用AI解决实际问题。
                 </p>
                 <div class="mt-8 flex gap-4">
-                    <a href="#projects" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                    <a href="about.html#projects" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all hover:shadow-lg">
                         查看我的项目
                     </a>
-                    <a href="#contact" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary dark:hover:border-ai transition-colors">
-                        联系我
+                    <a href="tools.html" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary dark:hover:border-ai transition-all hover:shadow-lg">
+                        实用工具 <i class="fa fa-wrench ml-1"></i>
                     </a>
                 </div>
             </div>
-            <div class="md:w-1/2 flex justify-center">
-                <!-- 头像/AI相关插图 -->
-                <div class="w-64 h-64 rounded-full bg-gradient-to-br from-primary/20 to-ai/20 flex items-center justify-center">
-                    <div class="text-8xl text-primary dark:text-ai">
+            <div class="md:w-1/2 flex justify-center section-fade">
+                <!-- 浮动AI图标 -->
+                <div class="w-64 h-64 rounded-full bg-gradient-to-br from-primary/20 to-ai/20 flex items-center justify-center animate-float">
+                    <div class="text-8xl text-primary dark:text-ai transition-transform hover:rotate-12 duration-500">
                         <i class="fa fa-robot" aria-hidden="true"></i>
                     </div>
                 </div>
@@ -113,270 +138,66 @@
         </div>
     </section>
 
-    <!-- 关于我 -->
-    <section id="about" class="py-20 bg-gray-100 dark:bg-gray-800/50">
+    <!-- 特色工具入口 -->
+    <section class="py-16 bg-gray-100 dark:bg-gray-800/50 relative z-10">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-12 text-center">关于我</h2>
-            <div class="max-w-3xl mx-auto">
-                <p class="text-lg leading-relaxed mb-6">
-                    我是一名AI方向的在读研究生/本科生，目前就读于哈尔滨工业大学（深圳）计算机专业，研究方向为机器学习/计算机视觉。
-                </p>
-                <p class="text-lg leading-relaxed mb-6">
-                    我热衷于探索AI技术的前沿应用，参与过多个相关项目，包括XX算法实现、XX数据集处理、XX模型调优等。擅长将理论知识转化为实际代码，喜欢用实验验证想法。
-                </p>
-                <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                        <p class="text-2xl font-bold text-primary dark:text-ai">3+</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">AI项目经验</p>
-                    </div>
-                    <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                        <p class="text-2xl font-bold text-primary dark:text-ai">5+</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">编程语言</p>
-                    </div>
-                    <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                        <p class="text-2xl font-bold text-primary dark:text-ai">10+</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">AI框架使用</p>
-                    </div>
-                    <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                        <p class="text-2xl font-bold text-primary dark:text-ai">2+</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">论文/实验记录</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 项目展示 -->
-    <section id="projects" class="py-20">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-12 text-center">AI 项目</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- 项目1 -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
-                    <div class="h-48 bg-gradient-to-r from-primary/30 to-ai/30 flex items-center justify-center">
-                        <i class="fa fa-brain text-6xl text-primary dark:text-ai" aria-hidden="true"></i>
+            <h2 class="text-3xl font-bold mb-12 text-center section-fade">我的实用工具</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 工具卡片1 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover section-fade">
+                    <div class="h-40 bg-gradient-to-r from-primary/30 to-ai/30 flex items-center justify-center">
+                        <i class="fa fa-clock-o text-6xl text-primary dark:text-ai" aria-hidden="true"></i>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">图像分类模型实现</h3>
+                        <h3 class="text-xl font-bold mb-2">AI 计时器</h3>
                         <p class="text-gray-600 dark:text-gray-300 mb-4">
-                            基于PyTorch实现ResNet50模型，在CIFAR-10数据集上达到92%准确率，包含数据增强、模型调优全过程。
+                            专为AI实验设计的计时器，支持多任务计时、数据记录、导出分析。
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">PyTorch</span>
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">计算机视觉</span>
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">ResNet</span>
-                        </div>
-                        <a href="#" class="text-primary dark:text-ai hover:underline flex items-center">
-                            查看代码 <i class="fa fa-github ml-2" aria-hidden="true"></i>
+                        <a href="tools.html#timer" class="text-primary dark:text-ai hover:underline flex items-center">
+                            立即使用 <i class="fa fa-arrow-right ml-2"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- 项目2 -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
-                    <div class="h-48 bg-gradient-to-r from-primary/30 to-ai/30 flex items-center justify-center">
-                        <i class="fa fa-comment text-6xl text-primary dark:text-ai" aria-hidden="true"></i>
+                <!-- 工具卡片2 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover section-fade">
+                    <div class="h-40 bg-gradient-to-r from-primary/30 to-ai/30 flex items-center justify-center">
+                        <i class="fa fa-calculator text-6xl text-primary dark:text-ai" aria-hidden="true"></i>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">文本情感分析</h3>
+                        <h3 class="text-xl font-bold mb-2">AI 计算器</h3>
                         <p class="text-gray-600 dark:text-gray-300 mb-4">
-                            使用BERT模型实现中文文本情感分析，基于美团评论数据集训练，准确率89%，包含数据预处理、模型微调。
+                            支持矩阵运算、激活函数计算、损失函数求值的AI专用计算器。
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">TensorFlow</span>
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">NLP</span>
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">BERT</span>
-                        </div>
-                        <a href="#" class="text-primary dark:text-ai hover:underline flex items-center">
-                            查看代码 <i class="fa fa-github ml-2" aria-hidden="true"></i>
+                        <a href="tools.html#calculator" class="text-primary dark:text-ai hover:underline flex items-center">
+                            立即使用 <i class="fa fa-arrow-right ml-2"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- 项目3 -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
-                    <div class="h-48 bg-gradient-to-r from-primary/30 to-ai/30 flex items-center justify-center">
-                        <i class="fa fa-line-chart text-6xl text-primary dark:text-ai" aria-hidden="true"></i>
+                <!-- 工具卡片3 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover section-fade">
+                    <div class="h-40 bg-gradient-to-r from-primary/30 to-ai/30 flex items-center justify-center">
+                        <i class="fa fa-edit text-6xl text-primary dark:text-ai" aria-hidden="true"></i>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">推荐系统实现</h3>
+                        <h3 class="text-xl font-bold mb-2">Markdown 编辑器</h3>
                         <p class="text-gray-600 dark:text-gray-300 mb-4">
-                            基于协同过滤和深度学习的混合推荐系统，在MovieLens数据集上完成，包含召回、排序、评估全流程。
+                            专为技术博客设计的轻量编辑器，支持公式、代码高亮、实时预览。
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">Scikit-learn</span>
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">推荐系统</span>
-                            <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded text-sm">协同过滤</span>
-                        </div>
-                        <a href="#" class="text-primary dark:text-ai hover:underline flex items-center">
-                            查看代码 <i class="fa fa-github ml-2" aria-hidden="true"></i>
+                        <a href="tools.html#editor" class="text-primary dark:text-ai hover:underline flex items-center">
+                            立即使用 <i class="fa fa-arrow-right ml-2"></i>
                         </a>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 技能栈 -->
-    <section id="skills" class="py-20 bg-gray-100 dark:bg-gray-800/50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-12 text-center">AI 技能栈</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- 编程语言 -->
-                <div>
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <i class="fa fa-code text-primary dark:text-ai mr-2" aria-hidden="true"></i>
-                        编程语言
-                    </h3>
-                    <div class="space-y-3">
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>Python</span>
-                                <span>90%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-primary dark:bg-ai h-2 rounded-full" style="width: 90%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>JavaScript</span>
-                                <span>70%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-primary dark:bg-ai h-2 rounded-full" style="width: 70%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>C++</span>
-                                <span>65%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-primary dark:bg-ai h-2 rounded-full" style="width: 65%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI框架 -->
-                <div>
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <i class="fa fa-cogs text-primary dark:text-ai mr-2" aria-hidden="true"></i>
-                        AI 框架
-                    </h3>
-                    <div class="space-y-3">
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>PyTorch</span>
-                                <span>85%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-primary dark:bg-ai h-2 rounded-full" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>TensorFlow</span>
-                                <span>75%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-primary dark:bg-ai h-2 rounded-full" style="width: 75%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>Scikit-learn</span>
-                                <span>80%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-primary dark:bg-ai h-2 rounded-full" style="width: 80%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 研究方向 -->
-                <div>
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <i class="fa fa-flask text-primary dark:text-ai mr-2" aria-hidden="true"></i>
-                        研究方向
-                    </h3>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">机器学习</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">深度学习</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">计算机视觉</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">自然语言处理</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">推荐系统</span>
-                    </div>
-                </div>
-
-                <!-- 工具/平台 -->
-                <div>
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <i class="fa fa-wrench text-primary dark:text-ai mr-2" aria-hidden="true"></i>
-                        工具/平台
-                    </h3>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">Git/GitHub</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">Docker</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">Linux</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">Jupyter</span>
-                        <span class="px-3 py-1 bg-primary/10 text-primary dark:bg-ai/10 dark:text-ai rounded-full">VS Code</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 联系方式 -->
-    <section id="contact" class="py-20">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-12 text-center">联系我</h2>
-            <div class="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
-                <div class="space-y-6">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 rounded-full bg-primary/10 dark:bg-ai/10 flex items-center justify-center mr-4">
-                            <i class="fa fa-envelope text-primary dark:text-ai text-xl" aria-hidden="true"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">邮箱</p>
-                            <p class="font-medium">2990260882@qq.com</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 rounded-full bg-primary/10 dark:bg-ai/10 flex items-center justify-center mr-4">
-                            <i class="fa fa-github text-primary dark:text-ai text-xl" aria-hidden="true"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">GitHub</p>
-                            <p class="font-medium">github.com/your-username</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 rounded-full bg-primary/10 dark:bg-ai/10 flex items-center justify-center mr-4">
-                            <i class="fa fa-linkedin text-primary dark:text-ai text-xl" aria-hidden="true"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">LinkedIn</p>
-                            <p class="font-medium">linkedin.com/in/your-username</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                    <p class="text-center text-gray-600 dark:text-gray-300">
-                        欢迎交流AI相关问题、项目合作或实习机会
-                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 页脚 -->
-    <footer class="bg-gray-900 text-white py-8">
+    <footer class="bg-gray-900 text-white py-8 relative z-10">
         <div class="container mx-auto px-4 text-center">
-            <p>© 2025 Zeed - AI 个人主页</p>
+            <p>© 2025 XXX - AI 个人主页</p>
             <p class="mt-2 text-gray-400 text-sm">
                 用 ❤️ 构建的 AI 学生个人展示平台
             </p>
@@ -385,18 +206,42 @@
 
     <!-- JavaScript -->
     <script>
+        // 粒子背景初始化
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: ["#3b82f6", "#8b5cf6", "#10b981"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#3b82f6", opacity: 0.2, width: 1 },
+                move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "grab" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 0.8 } },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
         // 深色模式切换
         const themeToggle = document.getElementById('theme-toggle');
         const html = document.documentElement;
         
-        // 初始化主题
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             html.classList.add('dark');
         } else {
             html.classList.remove('dark');
         }
         
-        // 切换主题
         themeToggle.addEventListener('click', () => {
             html.classList.toggle('dark');
             localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
@@ -410,11 +255,34 @@
             mobileMenu.classList.toggle('hidden');
         });
         
+        // 滚动渐显效果
+        const fadeElements = document.querySelectorAll('.section-fade');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        fadeElements.forEach(el => observer.observe(el));
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md', 'py-2');
+                nav.classList.remove('shadow-sm', 'py-3');
+            } else {
+                nav.classList.remove('shadow-md', 'py-2');
+                nav.classList.add('shadow-sm', 'py-3');
+            }
+        });
+        
         // 平滑滚动
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                
                 const targetId = this.getAttribute('href');
                 const targetElement = document.querySelector(targetId);
                 
@@ -423,23 +291,9 @@
                         top: targetElement.offsetTop - 80,
                         behavior: 'smooth'
                     });
-                    
-                    // 关闭移动端菜单
                     mobileMenu.classList.add('hidden');
                 }
             });
-        });
-        
-        // 导航栏滚动效果
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            if (window.scrollY > 50) {
-                nav.classList.add('shadow-md');
-                nav.classList.remove('shadow-sm');
-            } else {
-                nav.classList.remove('shadow-md');
-                nav.classList.add('shadow-sm');
-            }
         });
     </script>
 </body>
