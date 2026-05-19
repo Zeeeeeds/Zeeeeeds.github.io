@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>情侣照片画廊 · Zeed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        .gallery {
+            position: relative;
+            width: 100%;
+            min-height: 60vh;
+        }
+        .photo {
+            position: absolute;
+            display: block;
+            width: clamp(150px, 20vw, 210px);
+            padding: 0.75rem 0.75rem 1.4rem;
+            background: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+            transform: rotate(var(--rot, 0deg));
+            transition: transform .2s ease, box-shadow .2s ease;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .photo:hover {
+            transform: rotate(var(--rot, 0deg)) scale(1.05);
+            box-shadow: 0 18px 36px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.12);
+            z-index: 3;
+        }
+        .photo:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 3px;
+        }
+        .photo img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            border-radius: 0.3rem;
+            user-select: none;
+        }
+        .back { display:inline-flex; gap:.5rem; align-items:center; padding:.5rem .75rem; border-radius:.5rem; background:rgba(255,255,255,0.9); }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 1.5rem;
+        }
+        .lightbox.hidden { display: none; }
+        .lightbox-content {
+            background: #111827;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            max-width: min(92vw, 980px);
+            max-height: 86vh;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .lightbox-image {
+            max-width: 90vw;
+            max-height: 70vh;
+            object-fit: contain;
+            transform-origin: center center;
+            transition: transform .15s ease;
+            background: #000;
+            border-radius: 0.5rem;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .photo, .photo:hover, .lightbox-image { transition: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen">
+    <header class="py-6 shadow-sm bg-white/80 dark:bg-gray-800/80 fixed w-full z-40">
+        <div class="container mx-auto px-4 flex items-center justify-between">
+            <a href="index.html" class="font-bold text-xl text-primary dark:text-ai">Zeed</a>
+            <a href="index.html" class="back"><i class="fa fa-arrow-left"></i> 返回首页</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 pt-28 pb-16">
+        <section class="max-w-4xl mx-auto text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">照片画廊</h1>
+            <p class="text-gray-600 dark:text-gray-300">自从2022年5月27日认识你，我希望这里的照片永远不会停止增加</p>
+        </section>
+
+        <section class="gallery">
+            <!-- 使用 Unsplash 随机情侣图片，sig 用于稳定显示不同图片 -->
+            <!-- 你可以将这些 URL 替换为自己仓库内的图片路径 -->
+            <!-- 生成 24 张图片 -->
+            
+            <!-- We'll create multiple tiles -->
+            <script>
+                const total = 14; // 图片总数，按需修改
+                const base = 'assets/images/couples/';
+                const ext = '.jpg'; // 改为 .webp 如使用 webp
+                const gallery = document.querySelector('.gallery');
+
+                const images = Array.from({length: total}, (_, i) => {
+                    const name = String(i + 1).padStart(3, '0') + ext;
+                    return base + name;
+                });
+
+                const random = (min, max) => Math.random() * (max - min) + min;
+
+                gallery.innerHTML = images.map((u, idx) => {
+                    const rot = `${random(-7, 7).toFixed(2)}deg`;
+                    return `
+                        <button class="photo" type="button" data-src="${u}" data-alt="情侣 ${idx + 1}" style="--rot:${rot};">
+                            <img loading="lazy" src="${u}" alt="情侣 ${idx + 1}" />
+                        </button>`;
+                }).join('');
+
+                const placePhotos = () => {
+                    const cards = Array.from(gallery.querySelectorAll('.photo'));
+                    if (!cards.length) return;
+
+                    const containerWidth = gallery.clientWidth;
+                    const cardWidth = cards[0].offsetWidth;
+                    const cardHeight = cards[0].offsetHeight;
+                    const padding = 12;
+                    const placed = [];
+                    const viewHeight = Math.max(520, window.innerHeight - 220);
+                    const maxStackHeight = Math.min(viewHeight, cardHeight * 3.2);
+                    let maxBottom = 0;
+
+                    cards.forEach((card, index) => {
+                        let x = 0;
+                        let y = 0;
+                        let attempts = 0;
+                        const maxAttempts = 80;
+
+                        while (attempts < maxAttempts) {
+                            x = random((containerWidth - cardWidth) * 0.05, (containerWidth - cardWidth) * 0.95);
+                            y = random(0, Math.max(0, maxStackHeight - cardHeight + 10));
+
+                            const overlapOk = placed.every(box => {
+                                const xOverlap = Math.max(0, Math.min(x + cardWidth, box.x + box.w) - Math.max(x, box.x));
+                                const yOverlap = Math.max(0, Math.min(y + cardHeight, box.y + box.h) - Math.max(y, box.y));
+                                const overlapArea = xOverlap * yOverlap;
+                                return overlapArea < (cardWidth * cardHeight * 0.25);
+                            });
+
+                            if (overlapOk) break;
+                            attempts++;
+                        }
+
+                        card.style.left = `${x}px`;
+                        card.style.top = `${y}px`;
+                        card.style.zIndex = String(1 + (index % 5));
+
+                        placed.push({ x, y, w: cardWidth, h: cardHeight });
+                        maxBottom = Math.max(maxBottom, y + cardHeight + padding);
+                    });
+
+                    const finalHeight = Math.min(maxBottom + 40, maxStackHeight + 40);
+                    gallery.style.height = `${finalHeight}px`;
+                };
+
+                const whenImagesReady = () => {
+                    const imgs = Array.from(gallery.querySelectorAll('img'));
+                    return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
+                        img.addEventListener('load', resolve, { once: true });
+                        img.addEventListener('error', resolve, { once: true });
+                    })));
+                };
+
+                whenImagesReady().then(placePhotos);
+                window.addEventListener('resize', () => {
+                    clearTimeout(window.__galleryResizeTimer);
+                    window.__galleryResizeTimer = setTimeout(placePhotos, 120);
+                });
+            </script>
+        </section>
+
+        <p class="text-center text-sm text-gray-500 mt-8">提示：点击图片可查看原图，或在悬停时欣赏放大效果。</p>
+    </main>
+
+    <footer class="text-center py-8 text-gray-500">© 2026 Zeed</footer>
+
+    <div id="lightbox" class="lightbox hidden" aria-hidden="true">
+        <div class="lightbox-content" role="dialog" aria-modal="true">
+            <img id="lightbox-image" class="lightbox-image" src="" alt="预览" />
+        </div>
+    </div>
+
+    <!-- 可选：简单深色/浅色切换（使用本地存储） -->
+    <script>
+        // 从 index.html 复用主题逻辑的简化版
+        (function(){
+            try{
+                const html = document.documentElement;
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    html.classList.add('dark');
+                }
+            }catch(e){}
+        })();
+
+        (function(){
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            let scale = 1;
+
+            const updateScale = () => {
+                lightboxImage.style.transform = `scale(${scale})`;
+            };
+
+            const openLightbox = (src, alt) => {
+                lightboxImage.src = src;
+                lightboxImage.alt = alt || '预览';
+                scale = 1;
+                updateScale();
+                lightbox.classList.remove('hidden');
+                lightbox.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('overflow-hidden');
+            };
+
+            const closeLightbox = () => {
+                lightbox.classList.add('hidden');
+                lightbox.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('overflow-hidden');
+                lightboxImage.src = '';
+            };
+
+            document.addEventListener('click', (e) => {
+                const card = e.target.closest('.photo');
+                if (card) {
+                    const src = card.getAttribute('data-src');
+                    const alt = card.getAttribute('data-alt');
+                    openLightbox(src, alt);
+                }
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+
+            lightbox.addEventListener('wheel', (e) => {
+                if (lightbox.classList.contains('hidden')) return;
+                e.preventDefault();
+                scale = e.deltaY < 0 ? Math.min(3, scale + 0.1) : Math.max(1, scale - 0.1);
+                updateScale();
+            }, { passive: false });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+                    closeLightbox();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
